@@ -1,0 +1,24 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Build') {
+            steps {
+                echo 'Building application...'
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                sh 'docker build -t auth-service:v0.1.2 services/auth-service'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh 'kubectl rollout restart deployment/auth-service -n aiops'
+            }
+        }
+    }
+}

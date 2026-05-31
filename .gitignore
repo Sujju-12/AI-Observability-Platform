@@ -1,0 +1,48 @@
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Java / Maven
+target/
+*.class
+*.jar
+
+# Maven
+.mvn/
+dependency-reduced-pom.xml
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# NodeJS
+node_modules/
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Kubernetes
+kubeconfig
+
+# Secrets
+.env
+*.pem
+*.key
+*.crt
+secrets.yaml
+
+# Python
+__pycache__/
+*.pyc
+
+# Docker
+docker-data/
+
+# Temp
+*.swp
