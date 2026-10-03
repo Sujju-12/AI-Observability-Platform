@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+  namespace: aiops
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: {maxUnavailable: 1, maxSurge: 1}
+  selector:
+    matchLabels: {app: order-service}
+  template:
+    metadata:
+      labels: {app: order-service, version: v1}
+    spec:
+      containers:
+      - name: order-service
+        image: order-service:v1.0.0
+        imagePullPolicy: Never
+        ports: [{containerPort: 8002}]
+        env:
+        - {name: APP_VERSION, value: "1.0.0"}
+        - {name: AUTH_SERVICE_URL, value: "http://auth-service:8000"}
+        - {name: CATALOG_SERVICE_URL, value: "http://catalog-service:8001"}
+        readinessProbe: {httpGet: {path: /health, port: 8002}, initialDelaySeconds: 5, periodSeconds: 10}
+        livenessProbe: {httpGet: {path: /health, port: 8002}, initialDelaySeconds: 15, periodSeconds: 15}
+        resources:
+          requests: {cpu: 50m, memory: 64Mi}
+          limits: {cpu: 300m, memory: 256Mi}
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector: {matchLabels: {app: order-service}}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: order-service, namespace: aiops}
+spec:
+  selector: {app: order-service}
+  ports: [{port: 8002, targetPort: 8002}]
