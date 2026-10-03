@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: aiops-api
+  namespace: aiops
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: api.aiops.test
+    http:
+      paths:
+      - path: /auth
+        pathType: Prefix
+        backend: {service: {name: auth-service, port: {number: 8000}}}
+      - path: /catalog
+        pathType: Prefix
+        backend: {service: {name: catalog-service, port: {number: 8001}}}
+      - path: /orders
+        pathType: Prefix
+        backend: {service: {name: order-service, port: {number: 8002}}}
+      - path: /ai
+        pathType: Prefix
+        backend: {service: {name: ai-engine, port: {number: 8080}}}
