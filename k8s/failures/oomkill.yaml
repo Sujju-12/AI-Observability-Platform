@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: aiops-oom-test, namespace: aiops}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: aiops-oom-test}}
+  template:
+    metadata: {labels: {app: aiops-oom-test}}
+    spec:
+      containers:
+      - name: memory-hog
+        image: python:3.12-alpine
+        command: ["python","-c","a=[]; [a.append('x'*1024*1024) for _ in range(1024)]"]
+        resources:
+          requests: {memory: 32Mi}
+          limits: {memory: 64Mi}
