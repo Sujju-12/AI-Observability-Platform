@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog-service
+  namespace: aiops
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: {maxUnavailable: 1, maxSurge: 1}
+  selector:
+    matchLabels: {app: catalog-service}
+  template:
+    metadata:
+      labels: {app: catalog-service, version: v1}
+    spec:
+      containers:
+      - name: catalog-service
+        image: catalog-service:v1.0.0
+        imagePullPolicy: Never
+        ports: [{containerPort: 8001}]
+        env: [{name: APP_VERSION, value: "1.0.0"}]
+        readinessProbe: {httpGet: {path: /health, port: 8001}, initialDelaySeconds: 5, periodSeconds: 10}
+        livenessProbe: {httpGet: {path: /health, port: 8001}, initialDelaySeconds: 15, periodSeconds: 15}
+        resources:
+          requests: {cpu: 50m, memory: 64Mi}
+          limits: {cpu: 250m, memory: 256Mi}
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector: {matchLabels: {app: catalog-service}}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: catalog-service, namespace: aiops}
+spec:
+  selector: {app: catalog-service}
+  ports: [{port: 8001, targetPort: 8001}]
