@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jaeger-config
+  namespace: aiops-observability
+data:
+  jaeger.yaml: |
+    extensions:
+      healthcheckv2:
+        endpoint: 0.0.0.0:13133
+      jaeger_query:
+        base_path: /
+        storage:
+          traces: memory_store
+        http:
+          endpoint: 0.0.0.0:16686
+      jaeger_storage:
+        backends:
+          memory_store:
+            memory:
+              max_traces: 100000
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+    processors:
+      batch:
+    exporters:
+      jaeger_storage_exporter:
+        trace_storage: memory_store
+    service:
+      extensions: [healthcheckv2, jaeger_query]
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [jaeger_storage_exporter]
