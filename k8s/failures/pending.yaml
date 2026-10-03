@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: aiops-pending-test, namespace: aiops}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: aiops-pending-test}}
+  template:
+    metadata: {labels: {app: aiops-pending-test}}
+    spec:
+      containers:
+      - name: impossible
+        image: nginx:1.27
+        resources:
+          requests:
+            cpu: "100"
+            memory: "999Gi"
