@@ -1,0 +1,12 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: aiops-imagepull-test, namespace: aiops}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: aiops-imagepull-test}}
+  template:
+    metadata: {labels: {app: aiops-imagepull-test}}
+    spec:
+      containers:
+      - name: broken-image
+        image: aiops/nonexistent-image:v999
